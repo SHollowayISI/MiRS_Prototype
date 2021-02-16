@@ -20,7 +20,8 @@ for i = 1:length(fold)
     end
 end
 
-names = {'Reflector Off', 'Active Reflector', 'Corner Reflector'};
+% names = {'Reflector Off', 'Active Reflector', 'Corner Reflector'};
+names = {'Test First Run', 'Test Second Run'};
 
 for file_loop = 1:length(files)
     
