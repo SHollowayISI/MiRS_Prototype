@@ -7,7 +7,7 @@ clear variables;
 
 %% Obtain input files
 
-filepath = 'Input Data/Test 021621';
+filepath = 'Input Data/Test 021621/Outside';
 fold = dir(filepath);
 k = 1;
 files = {};
@@ -21,7 +21,13 @@ for i = 1:length(fold)
 end
 
 % names = {'Reflector Off', 'Active Reflector', 'Corner Reflector'};
-names = {'Test First Run', 'Test Second Run'};
+% names = {'Test First Run', 'Test Second Run'};
+% names = {'test'};
+names = {'Test', 'Far Reference', 'Far 1', 'Far 2', 'Far 3', 'Far 4', 'Far 5', ...
+    'Far 6', 'Far 7', 'Far 8', 'Far 9', 'Car', 'Far 10', 'Far Corner', 'Victor Approaching 1', ...
+    'Victor Approaching 2', 'Close Reference', 'Close 1', 'Close 2', 'Close 3', 'Close 4', ...
+    'Close 5', 'Close 6', 'Close 7', 'Close 8', 'Close 9', 'Close 10', 'Close Corner and Active', ...
+    'Close Corner'};
 
 for file_loop = 1:length(files)
     
@@ -29,7 +35,7 @@ for file_loop = 1:length(files)
     
     f_c = 78e9;
     bw = 2e9;
-    f_s = 40e6;
+    f_s = 20e6;
     t_ch = 102.4e-6;
     t_idle = 5e-6;
     
@@ -40,7 +46,7 @@ for file_loop = 1:length(files)
     num_samples = 4096;
     num_tx = 2;
     num_rx = 2;
-    num_chirps = 255;
+    num_chirps = 232*2;
     num_frames = 1;
     complex_sampling = false;
     
@@ -57,8 +63,8 @@ for file_loop = 1:length(files)
     
     data = data - (data >= 2.^15) .* 2.^16;
     if complex_sampling
-        data = reshape(data(1:total_samps), [2*num_lanes, total_samps/(2*num_lanes)]);
-        data = permute(data(1:num_lanes,:) + 1i*data((num_lanes+1):(2*num_lanes),:), [2 3 1]);
+        data = reshape(data(1:total_samps), [8, total_samps/8]);
+        data = permute(data(1:num_lanes,:) + 1i*data(4 + (1:num_lanes),:), [2 3 1]);
     else
         data = reshape(data(1:total_samps), [num_lanes, total_samps/num_lanes]);
         data = permute(data, [2 3 1]);
@@ -82,15 +88,16 @@ for file_loop = 1:length(files)
     %% Radar cube processing
     
     N_r = 2^ceil(log2(num_samples));
-    range_cube = fft(hanning(num_samples) .* data_shaped, N_r, 1);
     if complex_sampling
+        range_cube = fft(hanning(size(data_shaped, 1)) .* data_shaped, N_r, 1);
         range_cube(end+1,:,:) = range_cube(1,:,:);
         range_res = (c/(2*bw));
         range_axis = ((0:N_r)-1)*range_res;
     else
+        range_cube = fft(hanning(num_samples) .* data_shaped, N_r, 1);
         range_cube = range_cube(1:ceil(end/2),:,:);
         range_res = (c/(2*bw));
-        range_axis = ((1:(N_r/2))-1)*2*range_res;
+        range_axis = ((1:(N_r/2))-1)*range_res;
     end
     
     
@@ -120,7 +127,11 @@ for file_loop = 1:length(files)
     figure('Name', 'Zero Doppler Range Plot');
     plot(range_axis, 10*log10(pow_cube(:,ceil(end/2),ceil(end/2))));
     grid on;
-    xlim([0 20])
+    if file_loop < 15
+        xlim([120 140])
+    else
+        xlim([70 90])
+    end
     xlabel('Range [m]', 'FontWeight', 'bold');
     ylim([60 160])
     ylabel('Doppler Velocity [m/s]', 'FontWeight', 'bold')
@@ -134,7 +145,7 @@ for file_loop = 1:length(files)
     
     %% Save figures
     
-    SaveFigures(names{file_loop}, 'Figures/Test 021621', '.png');
+    SaveFigures(names{file_loop}, 'Figures/Test 021621/Outside', '.png');
     close all;
     
     
