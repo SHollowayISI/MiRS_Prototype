@@ -7,7 +7,7 @@ clear variables;
 
 %% Obtain input files
 
-filepath = 'Input Data/Test 021621/Outside';
+filepath = 'Input Data/Test 021621';
 fold = dir(filepath);
 k = 1;
 files = {};
@@ -23,11 +23,17 @@ end
 % names = {'Reflector Off', 'Active Reflector', 'Corner Reflector'};
 % names = {'Test First Run', 'Test Second Run'};
 % names = {'test'};
-names = {'Test', 'Far Reference', 'Far 1', 'Far 2', 'Far 3', 'Far 4', 'Far 5', ...
-    'Far 6', 'Far 7', 'Far 8', 'Far 9', 'Car', 'Far 10', 'Far Corner', 'Victor Approaching 1', ...
-    'Victor Approaching 2', 'Close Reference', 'Close 1', 'Close 2', 'Close 3', 'Close 4', ...
-    'Close 5', 'Close 6', 'Close 7', 'Close 8', 'Close 9', 'Close 10', 'Close Corner and Active', ...
-    'Close Corner'};
+% names = {'Test', 'Far Reference', 'Far 1', 'Far 2', 'Far 3', 'Far 4', 'Far 5', ...
+%     'Far 6', 'Far 7', 'Far 8', 'Far 9', 'Car', 'Far 10', 'Far Corner', 'Victor Approaching 1', ...
+%     'Victor Approaching 2', 'Close Reference', 'Close 1', 'Close 2', 'Close 3', 'Close 4', ...
+%     'Close 5', 'Close 6', 'Close 7', 'Close 8', 'Close 9', 'Close 10', 'Close Corner and Active', ...
+%     'Close Corner'};
+names = {'Far 1', 'Far 2', 'Far 3', 'Far 4', 'Far 5', ...
+    'Far 6', 'Far 7', 'Far 8', 'Far 9', 'Far 10', 'Close 1', 'Close 2', 'Close 3', 'Close 4', ...
+    'Close 5', 'Close 6', 'Close 7', 'Close 8', 'Close 9', 'Close 10'};
+
+centerOfMass = {};
+meanPosition = {};
 
 for file_loop = 1:length(files)
     
@@ -108,6 +114,7 @@ for file_loop = 1:length(files)
     
     N_d = 2^ceil(log2(num_chirps));
     rd_cube = fftshift(fft(hanning(num_chirps)' .* range_cube, N_d, 2), 2);
+%     rd_cube = fftshift(fft(range_cube, N_d, 2), 2);
     rd_cube(:,end+1,:,:) = rd_cube(:,1,:,:);
     
     vel_res = lambda/(2*(t_ch + t_idle)*num_chirps*num_tx);
@@ -131,7 +138,7 @@ for file_loop = 1:length(files)
         'ThresholdFactor',          'Auto', ...
         'OutputFormat',             'CUT result');
     
-    if file_loop < 15
+    if file_loop < 11
         ind = 1708:1736;
     else
         ind = 1042:1082;
@@ -158,9 +165,12 @@ for file_loop = 1:length(files)
 %     ylabel('Range [m]', 'FontWeight', 'bold');
     
     figure('Name', 'Zero Doppler Range Plot');
-    plot(range_axis, 10*log10(static_cube(:,1)));
+    for fr = 1:num_frames
+        plot(range_axis, 10*log10(static_cube(:,fr)));
+        hold on;
+    end
     grid on;
-    if file_loop < 15
+    if file_loop < 11
         xlim([120 140])
     else
         xlim([70 90])
@@ -189,8 +199,8 @@ end
 
 close all;
 
-far_inds = [3:11, 13];
-close_inds = 18:27;
+far_inds = 1:10;
+close_inds = 11:20;
 
 far_axis = (0:9)*0.1016;
 close_axis = (0:9)*0.1016;
