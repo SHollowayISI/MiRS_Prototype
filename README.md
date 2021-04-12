@@ -1,6 +1,6 @@
-# MiRS
-MATLAB Simulation for MiRS Project
+# MiRS Prototype
+MATLAB project for MiRS Prototype
 
-Project code based off of PAN-UAS structure.
+## Overview
 
-Initiated 10/8/2020
+Mostly unused, aside from Scratch files for TI unit processing. Refer to MiRS standard project otherwise. 
